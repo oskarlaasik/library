@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<a href="{{ url_for('client_bp.create_book') }}" class="navbar-item bg-secondary">
+    Add Book
+</a>
+<div>
+    {% from "_formhelpers.html" import render_field %}
+    <form method="post">
+        <dl>
+            <p>
+                {{ render_field(form.search) }}
+            </p>
+        </dl>
+        <p><input type="submit" value="Search">
+        </p></form>
+</div>
+<table id="data" class="table table-striped">
+    <thead>
+    <tr>
+        <th>title</th>
+        <th>author</th>
+        <th>genre</th>
+        <th>year</th>
+        <th>reserved</th>
+        <th>borrowed</th>
+        <th>due date</th>
+        <th>delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for book in books %}
+    <tr>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.genre }}</td>
+        <td>{{ book.year }}</td>
+        <td>
+            <form action="{{ url_for('api_bp.mark_reserved', book_id=book.id) }}" method=post>
+                <input type=submit value="{{'mark reserved' if book.reserved else 'unreserve'}}">
+            </form>
+        </td>
+        <td>
+            <form action="{{ url_for('api_bp.mark_borrowed', book_id=book.id) }}" method=post>
+                <input type=submit value="{{'mark returned' if book.borrowed else 'mark borrowed'}}">
+            </form>
+        </td>
+        <td>{{ book.year }}</td>
+        <td>
+            <form action="{{ url_for('api_bp.delete_book', book_id=book.id) }}" method=post>
+                <input type=submit value=X>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

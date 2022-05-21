@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    {% from "_formhelpers.html" import render_field %}
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="notification is-danger">
+        {{ messages[0] }}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <form method="post">
+        <dl>
+            <p>
+                {{ render_field(form.title) }}
+                {{ render_field(form.author) }}
+                {{ render_field(form.genre) }}
+                {{ render_field(form.year) }}
+            </p>
+        </dl>
+        <p><input type="submit" value="Submit Book">
+        </p></form>
+</div>
+{% endblock %}

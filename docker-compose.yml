@@ -1,0 +1,38 @@
+version: '3'
+services:
+  db:
+    image: postgres:14.2
+    volumes:
+      - "dbdata:/var/lib/postgresql/data"
+    env_file:
+      - env_file
+    networks:
+      - db_nw
+  library:
+    build: .
+    env_file:
+      - env_file
+    volumes:
+      - .:/opt/services/library/src
+    networks:
+      - db_nw
+      - web_nw
+    depends_on:
+      - db
+  nginx:
+    image: nginx:1.21.6
+    ports:
+      - "8080:80"
+    volumes:
+      - ./conf.d:/etc/nginx/conf.d
+    networks:
+      - web_nw
+    depends_on:
+      - library
+networks:
+  db_nw:
+    driver: bridge
+  web_nw:
+    driver: bridge
+volumes:
+  dbdata:
