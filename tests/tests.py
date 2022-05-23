@@ -1,43 +1,40 @@
-import pytest
+from flask import session
+from werkzeug.security import generate_password_hash
 
 from src import db
-from src import init_app
-from src.models import Borrow,User,Book
+from src.models import User, Book
 
 
-@pytest.fixture()
-def app():
-    app = init_app(test=True)
-
-    db.init_app(app)  # initialise the database for the app
+def test_create_user(app):
     with app.app_context():
-        # always starting with an empty DB
-        db.drop_all()
-        db.create_all()
-    yield app
+        User.create('name', 'email', 'password')
+        assert db.session.query(User).one()
 
+
+def test_delete_book_not_logged_in(app, client):
     with app.app_context():
-        db.session.remove()
-        db.drop_all()
+        book = Book('title', 'author', 'genre', 1997, None, None, 'Available')
+        db.session.add(book)
+        db.session.commit()
+        response = client.get("/book/delete/" + str(book.id))
+        assert 405 == response.status_code
+        assert db.session.query(Book).one()
 
 
-@pytest.fixture()
-def client(app):
-    return app.test_client()
-
-
-@pytest.fixture()
-def runner(app):
-    return app.test_cli_runner()
-
-
-def test_insert_product(app):
+def test_delete_book_not_logged_in(app, client):
     with app.app_context():
-        Apartment.create(1, 1, 1, 1)
-        assert db.session.query(Apartment).one()
+        book = Book('title', 'author', 'genre', 1997, None, None, 'Available')
+        db.session.add(book)
+        db.session.commit()
+        response = client.get("/book/delete/" + str(book.id))
+        assert 405 == response.status_code
+        assert db.session.query(Book).one()
 
 
-def test_insert_Order(app):
+def test_login(app, client):
     with app.app_context():
-        Broker.create('Peeter Maakler', 'Firma')
-        assert db.session.query(Broker).one()
+        with client:
+            password = generate_password_hash('password', method='sha256')
+            User.create('name', 'email@email.com', password)
+            response = client.post('/login', data={'email': 'email@email.com', 'password': 'password'})
+            assert session["_user_id"] == '1'

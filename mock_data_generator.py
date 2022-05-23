@@ -12,7 +12,6 @@ from src.models import *
 def insert_dummy_data():
     app = init_app()
     with app.app_context():
-        Borrow.query.delete()
         Book.query.delete()
         User.query.delete()
 
@@ -36,19 +35,22 @@ def insert_dummy_data():
                             author=book[2],
                             year=book[7].split()[-1],
                             genre=book[8],
-                            user_id=random.choice(users).id
+                            owner_id=random.choice(users).id
                             )
 
         books = Book.query.order_by(func.random()).limit(16).all()
-        date_begin = datetime.date.today()
-        date_end = date_begin + datetime.timedelta(days=14)
-        for book in books:
-            Borrow.create(date_begin=date_begin,
-                          date_end=date_end,
-                          #Remove book owner from potential borrower list
-                          user_id=random.choice([user for user in users if user.id != book.id]).id,
-                          book_id=book.id
-                          )
+        today = datetime.date.today()
+        due_date = today - datetime.timedelta(days=14)
+        for book in books[:7]:
+            book.status = 'Reserved'
+            book.reader_id = random.choice([user for user in users if user.id != book.owner_id]).id,
+
+        for book in books[8:]:
+            book.borrowed = True
+            book.status = 'Borrowed'
+            book.due_date = due_date
+            book.reader_id = random.choice([user for user in users if user.id != book.owner_id]).id,
+        db.session.commit()
 
 
 if __name__ == "__main__":

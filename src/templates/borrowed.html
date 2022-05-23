@@ -1,20 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="{{ url_for('client_bp.create_book') }}" class="navbar-item bg-secondary">
-    Add Book
-</a>
-<div>
-    {% from "_formhelpers.html" import render_field %}
-    <form method="post">
-        <dl>
-            <p>
-                {{ render_field(search_form.search) }}
-            </p>
-        </dl>
-        <p><input type="submit" value="Search">
-        </p></form>
-</div>
 <table id="data" class="table table-striped">
     <thead>
     <tr>
@@ -30,11 +16,8 @@
     </thead>
     <tbody>
     {% for book in books %}
-    {% if book.overdue %}
-    <tr style="background-color:#CB9184">
-        {% else %}
+
     <tr>
-        {% endif %}
         <td>{{ book.title }}</td>
         <td>{{ book.author }}</td>
         <td>{{ book.genre }}</td>
@@ -64,11 +47,6 @@
         <td>Available</td>
         {% endif %}
         <td>{{ book.due_date }}</td>
-        <td>
-            <form action="{{ url_for('api_bp.delete_book', book_id=book.id) }}" method=post>
-                <input type=submit value=X>
-            </form>
-        </td>
     </tr>
     {% endfor %}
     </tbody>

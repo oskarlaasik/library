@@ -9,6 +9,6 @@ WORKDIR /opt/services/library/src
 RUN pip install -r requirements.txt
 COPY . /opt/services/library/src
 EXPOSE 5090
-CMD ["python", "server.py"]
+CMD ["python", "library.py"]
 
 

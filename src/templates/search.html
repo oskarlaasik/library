@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    {% from "_formhelpers.html" import render_field %}
+    <form method="post">
+        <dl>
+            <p>
+                {{ render_field(search_form.search) }}
+            </p>
+        </dl>
+        <p><input type="submit" value="Search">
+        </p></form>
+</div>
+<table id="data" class="table table-striped">
+    <thead>
+    <tr>
+        <th>title</th>
+        <th>author</th>
+        <th>genre</th>
+        <th>year</th>
+        <th>reserved</th>
+        <th>borrowed</th>
+        <th>due date</th>
+        <th>delete</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for book in books %}
+
+    <tr>
+        <td>{{ book.title }}</td>
+        <td>{{ book.author }}</td>
+        <td>{{ book.genre }}</td>
+        <td>{{ book.year }}</td>
+        {% if book.status == 'Available' %}
+        <td>
+            <form action="{{ url_for('api_bp.update_status', book_id=book.id, status='Reserved') }}" method=post>
+                <input type=submit value="Reserve">
+            </form>
+        </td>
+        {% else %}
+        <td>{{ book.status }}</td>
+        {% endif %}
+        <td>{{ book.due_date }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from src import db
@@ -27,3 +28,7 @@ def client(app):
 @pytest.fixture()
 def runner(app):
     return app.test_cli_runner()
+
+@pytest.fixture(autouse=True)
+def change_test_dir(request, monkeypatch):
+    monkeypatch.chdir('/opt/project')
